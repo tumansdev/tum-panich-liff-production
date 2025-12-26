@@ -10,15 +10,103 @@ const PaymentPage = ({ onBack, onSuccess, orderData }) => {
   const { cart, subtotal, clearCart } = useCart();
   const { user, apiCall } = useUser();
 
-  // ... (persist logic stays same)
-  // ... (state vars stay same)
+  const [step, setStep] = useState(1);
+  const [deliveryType, setDeliveryType] = useState('pickup');
+  const [distance, setDistance] = useState(0);
+  const [deliveryAddress, setDeliveryAddress] = useState('');
+  const [phone, setPhone] = useState('');
+  const [userLocation, setUserLocation] = useState(null);
+  const [isLoadingLocation, setIsLoadingLocation] = useState(false);
+  const [locationError, setLocationError] = useState('');
+  const [slipFile, setSlipFile] = useState(null);
+  const [slipPreview, setSlipPreview] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [discount, setDiscount] = useState(0);
 
-  // ... (useEffect persist stays same)
+  // Load saved data
+  const PAYMENT_FORM_KEY = 'tum_panich_payment_form';
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(PAYMENT_FORM_KEY);
+      if (saved) {
+        const data = JSON.parse(saved);
+        if (data.phone) setPhone(data.phone);
+        if (data.deliveryAddress) setDeliveryAddress(data.deliveryAddress);
+      }
+    } catch (e) {
+      console.error('Failed to load saved form', e);
+    }
+  }, []);
+
+  // Save form data
+  useEffect(() => {
+    const data = { phone, deliveryAddress };
+    localStorage.setItem(PAYMENT_FORM_KEY, JSON.stringify(data));
+  }, [phone, deliveryAddress]);
 
   const deliveryFee = deliveryType === 'pickup' ? 0 : (distance && distance > 2 ? 'COD' : 0);
   const total = subtotal - discount + (typeof deliveryFee === 'number' ? deliveryFee : 0);
 
-  // ... (handleSlipChange, handleGetLocation, copyLocation stay same)
+  const handleSlipChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSlipFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setSlipPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleGetLocation = () => {
+    setIsLoadingLocation(true);
+    setLocationError('');
+
+    if (!navigator.geolocation) {
+      setLocationError('เบราว์เซอร์ของคุณไม่รองรับการระบุตำแหน่ง');
+      setIsLoadingLocation(false);
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const { latitude, longitude } = position.coords;
+        setUserLocation({ lat: latitude, lng: longitude });
+
+        // Mock distance calculation for now (or implement Haversine)
+        // In real app, calculate distance from shop to user
+        const shopLat = 13.7563; // Example BKK
+        const shopLng = 100.5018;
+
+        // Simple distance calc (Pythagoras on lat/lng - roughly)
+        const R = 6371; // km
+        const dLat = (latitude - shopLat) * Math.PI / 180;
+        const dLon = (longitude - shopLng) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+          Math.cos(shopLat * Math.PI / 180) * Math.cos(latitude * Math.PI / 180) *
+          Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const d = R * c; // Distance in km
+
+        setDistance(d);
+        setIsLoadingLocation(false);
+      },
+      (error) => {
+        console.error('Location error:', error);
+        setLocationError('ไม่สามารถระบุตำแหน่งได้ กรุณาเปิด GPS');
+        setIsLoadingLocation(false);
+      }
+    );
+  };
+
+  const copyLocation = () => {
+    if (userLocation) {
+      const text = `${userLocation.lat},${userLocation.lng}`;
+      navigator.clipboard.writeText(text);
+      alert('คัดลอกพิกัดแล้ว');
+    }
+  };
 
   const handleSubmit = async () => {
     if (!slipFile && !slipPreview) {
