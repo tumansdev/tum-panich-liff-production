@@ -27,29 +27,42 @@ if (missingVars.length > 0) {
   process.exit(1);
 }
 
+// Helper to parse boolean
+const parseBool = (val) => {
+  if (!val) return false;
+  return val.toString().toLowerCase() === 'true' || val.toString() === '1';
+};
+
+// Helper to parse array
+const parseArray = (val) => {
+  if (!val) return [];
+  return val.split(',').map(item => item.trim()).filter(Boolean);
+};
+
 // Build config object with defaults
 const config = {
   // Server
   port: parseInt(process.env.PORT || optionalEnvVars.PORT, 10),
   nodeEnv: process.env.NODE_ENV || optionalEnvVars.NODE_ENV,
-  isProduction: process.env.NODE_ENV === 'production',
-  isDevelopment: process.env.NODE_ENV !== 'production',
+  isProduction: (process.env.NODE_ENV || optionalEnvVars.NODE_ENV) === 'production',
+  isDevelopment: (process.env.NODE_ENV || optionalEnvVars.NODE_ENV) !== 'production',
 
   // Database
   databaseUrl: process.env.DATABASE_URL,
 
   // Authentication
   jwtSecret: process.env.JWT_SECRET,
-  enableDevAuth: process.env.ENABLE_DEV_AUTH === 'true',
+  enableDevAuth: parseBool(process.env.ENABLE_DEV_AUTH || optionalEnvVars.ENABLE_DEV_AUTH),
 
   // CORS
-  corsOrigins: (process.env.CORS_ORIGINS || optionalEnvVars.CORS_ORIGINS)
-    .split(',')
-    .map(origin => origin.trim()),
+  corsOrigins: parseArray(process.env.CORS_ORIGINS || optionalEnvVars.CORS_ORIGINS),
 
   // Rate Limiting
   rateLimitWindowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || optionalEnvVars.RATE_LIMIT_WINDOW_MS, 10),
   rateLimitMax: parseInt(process.env.RATE_LIMIT_MAX || optionalEnvVars.RATE_LIMIT_MAX, 10),
+  
+  // File Uploads
+  uploadDir: process.env.UPLOAD_DIR || './uploads',
 };
 
 // Log config in development (without secrets)
