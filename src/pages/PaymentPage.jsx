@@ -123,10 +123,10 @@ const PaymentPage = ({ onBack, onSuccess, orderData }) => {
     try {
       // Prepare order items
       const orderItems = cart.map(item => ({
-        menuItemId: item.id,
+        menuItemId: parseInt(item.id),
         name: item.name,
-        price: item.price,
-        quantity: item.qty,
+        price: parseFloat(item.price),
+        quantity: parseInt(item.qty),
         note: item.note || null,
         options: item.options || [],
       }));

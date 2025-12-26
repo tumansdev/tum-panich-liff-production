@@ -105,6 +105,7 @@ function validate(schema, source = 'body') {
       return res.status(400).json({
         success: false,
         error: 'Invalid request data',
+        debug: error.message, // Add debug info
       });
     }
   };
