@@ -137,8 +137,19 @@ export function UserProvider({ children }) {
       'X-LINE-USERID': auth.lineUserId,
     };
 
-    if (auth.accessToken) {
-      headers['X-LINE-TOKEN'] = auth.accessToken;
+    // Always try to get a fresh token from LIFF directly if available
+    let token = auth.accessToken;
+    if (!token && liff.isLoggedIn()) {
+      token = liff.getAccessToken();
+    }
+
+    if (token) {
+      headers['X-LINE-TOKEN'] = token;
+    } else if (liff.isInClient() && !import.meta.env.DEV) {
+      // If no token in LIFF browser (production), we must login
+      console.warn('No access token found, forcing login...');
+      liff.login();
+      return { success: false, error: 'Redirecting to login...' };
     }
 
     // Only set JSON content type if body is NOT FormData
