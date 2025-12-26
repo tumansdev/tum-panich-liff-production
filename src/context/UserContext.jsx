@@ -175,7 +175,7 @@ export function UserProvider({ children }) {
         throw new Error(data.error || 'Something went wrong');
       }
 
-      return { success: true, data };
+      return data;
     } catch (err) {
       console.error('API Call Error:', err);
       return { success: false, error: err.message };
