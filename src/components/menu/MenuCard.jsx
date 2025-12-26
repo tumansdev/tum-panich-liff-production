@@ -38,10 +38,11 @@ const MenuCard = ({ item, onClick }) => {
       onClick={onClick}
       className="group bg-white rounded-2xl p-3 shadow-sm border border-gray-100 hover:shadow-lg hover:border-primary/20 transition-all cursor-pointer"
     >
-      <div className="relative aspect-square rounded-xl overflow-hidden mb-3">
+      <div className="relative aspect-square rounded-xl overflow-hidden mb-3 bg-gray-100">
         <img
           src={item.image_url}
           alt={item.name}
+          loading="lazy"
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
         />
         {/* Rating badge */}

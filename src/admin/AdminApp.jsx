@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
+import POSPage from './pages/POSPage';
 import OrdersPage from './pages/OrdersPage';
 import MenuPage from './pages/MenuPage';
 import ReportsPage from './pages/ReportsPage';
@@ -18,7 +19,7 @@ function AdminApp() {
 
 function AppContent() {
   const { isAuthenticated, isLoading } = useAuth();
-  const [currentPage, setCurrentPage] = useState('dashboard');
+  const [currentPage, setCurrentPage] = useState('pos');
 
   if (isLoading) {
     return (
@@ -39,6 +40,8 @@ function AppContent() {
     switch (currentPage) {
       case 'dashboard':
         return <DashboardPage />;
+      case 'pos':
+        return <POSPage />;
       case 'orders':
         return <OrdersPage />;
       case 'menu':

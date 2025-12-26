@@ -127,6 +127,50 @@ export function UserProvider({ children }) {
     return false;
   };
 
+  // Wrapper for API calls with automatic token injection and error handling
+  const apiCall = useCallback(async (endpoint, options = {}) => {
+    const auth = getAuthForApi();
+    const url = `${import.meta.env.VITE_API_URL || 'http://localhost:5001/api'}${endpoint}`;
+
+    const headers = {
+      ...options.headers,
+      'X-LINE-USERID': auth.lineUserId,
+    };
+
+    if (auth.accessToken) {
+      headers['X-LINE-TOKEN'] = auth.accessToken;
+    }
+
+    // Only set JSON content type if body is NOT FormData
+    if (!(options.body instanceof FormData)) {
+      headers['Content-Type'] = 'application/json';
+    }
+
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (response.status === 401) {
+          // Token expired or invalid
+          console.warn('Token expired, attempting logout/refresh...');
+          // Optional: Force re-login or just throw specific error
+          // liff.login(); // Might be too aggressive to auto-login here
+        }
+        throw new Error(data.error || 'Something went wrong');
+      }
+
+      return { success: true, data };
+    } catch (err) {
+      console.error('API Call Error:', err);
+      return { success: false, error: err.message };
+    }
+  }, [getAuthForApi]);
+
   const value = {
     user,
     accessToken,
@@ -138,6 +182,7 @@ export function UserProvider({ children }) {
     shareMessage,
     getAccessToken,
     getAuthForApi,
+    apiCall, // Export helper
     liff,
   };
 

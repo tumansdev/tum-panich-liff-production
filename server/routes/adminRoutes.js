@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
 const adminAuth = require('../middleware/adminAuth');
+const { uploadMenu } = require('../middleware/upload');
 
 // POST /api/admin/login - Admin login
 router.post('/login', adminController.login);
@@ -22,6 +23,7 @@ router.get('/orders/:id/slip', adminController.getOrderSlip);
 router.post('/orders/:id/verify-payment', adminController.verifyPayment);
 
 // Menu management
+router.post('/menu/upload', uploadMenu.single('image'), adminController.uploadMenuImage);
 router.get('/menu', adminController.getAllMenu);
 router.post('/menu', adminController.createMenuItem);
 router.patch('/menu/:id', adminController.updateMenuItem);

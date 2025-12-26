@@ -691,3 +691,21 @@ exports.getOrderSlip = async (req, res) => {
     res.status(500).json({ success: false, error: 'Failed to get slip' });
   }
 };
+// Upload menu image
+exports.uploadMenuImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, error: 'No file uploaded' });
+    }
+
+    const imageUrl = `/uploads/menu/${req.file.filename}`;
+
+    res.json({
+      success: true,
+      data: { imageUrl }
+    });
+  } catch (error) {
+    console.error('Upload menu image error:', error);
+    res.status(500).json({ success: false, error: 'Failed to upload image' });
+  }
+};

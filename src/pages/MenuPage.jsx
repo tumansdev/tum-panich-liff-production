@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Header, BottomNav, CartButton } from '../components/layout';
 import { MenuCard, CategoryFilter, PromoBanner, MenuItemModal } from '../components/menu';
-import { Loading } from '../components/common';
+import { Loading, Skeleton } from '../components/common';
 import { getMenu } from '../services/api';
 
 const MenuPage = ({ onGoToCart }) => {
@@ -48,10 +48,6 @@ const MenuPage = ({ onGoToCart }) => {
     return matchesCategory && matchesSearch;
   });
 
-  if (loading) {
-    return <Loading message="กำลังโหลดเมนู..." />;
-  }
-
   return (
     <div className="min-h-screen bg-background-light pb-32">
       <Header title="ตั้มพานิช" />
@@ -80,29 +76,52 @@ const MenuPage = ({ onGoToCart }) => {
         </div>
 
         {/* Category Filter */}
-        <CategoryFilter
-          categories={menuData.categories}
-          selected={selectedCategory}
-          onSelect={setSelectedCategory}
-        />
+        {loading ? (
+          <div className="flex gap-3 overflow-x-auto pb-4 no-scrollbar">
+            {[1, 2, 3, 4].map(i => (
+              <Skeleton key={i} className="min-w-[80px] h-10 rounded-full" />
+            ))}
+          </div>
+        ) : (
+          <CategoryFilter
+            categories={menuData.categories}
+            selected={selectedCategory}
+            onSelect={setSelectedCategory}
+          />
+        )}
 
         {/* Menu Grid */}
         <div className="grid grid-cols-2 gap-3">
-          {filteredItems.map((item) => (
-            <MenuCard
-              key={item.id}
-              item={item}
-              onClick={() => {
-                if (item.is_available !== false) {
-                  setSelectedItem(item);
-                  setShowModal(true);
-                }
-              }}
-            />
-          ))}
+          {loading ? (
+            // Skeleton Grid
+            [1, 2, 3, 4, 5, 6].map(i => (
+              <div key={i} className="bg-white rounded-2xl p-3 shadow-sm border border-gray-100">
+                <Skeleton className="w-full aspect-square rounded-xl mb-3" />
+                <Skeleton className="w-3/4 h-4 mb-2" />
+                <Skeleton className="w-1/2 h-3 mb-3" />
+                <div className="flex justify-between items-center">
+                  <Skeleton className="w-1/3 h-5" />
+                  <Skeleton className="w-8 h-8 rounded-full" />
+                </div>
+              </div>
+            ))
+          ) : (
+            filteredItems.map((item) => (
+              <MenuCard
+                key={item.id}
+                item={item}
+                onClick={() => {
+                  if (item.is_available !== false) {
+                    setSelectedItem(item);
+                    setShowModal(true);
+                  }
+                }}
+              />
+            ))
+          )}
         </div>
 
-        {filteredItems.length === 0 && (
+        {!loading && filteredItems.length === 0 && (
           <div className="text-center py-12 text-gray-500">
             <span className="material-symbols-outlined text-5xl mb-2 block">search_off</span>
             <p>ไม่พบเมนูที่คุณค้นหา</p>

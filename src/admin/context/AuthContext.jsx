@@ -55,13 +55,20 @@ export function AuthProvider({ children }) {
   // API call helper with auth
   const apiCall = async (endpoint, options = {}) => {
     const url = `${API_URL}${endpoint}`;
+
+    const headers = {
+      'Authorization': `Bearer ${token}`,
+      ...options.headers,
+    };
+
+    // Only set JSON content type if body is NOT FormData
+    if (!(options.body instanceof FormData)) {
+      headers['Content-Type'] = 'application/json';
+    }
+
     const response = await fetch(url, {
       ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`,
-        ...options.headers,
-      },
+      headers,
     });
 
     const data = await response.json();

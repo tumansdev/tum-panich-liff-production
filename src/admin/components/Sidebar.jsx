@@ -5,8 +5,8 @@ const Sidebar = ({ currentPage, onNavigate }) => {
   const { admin } = useAuth();
 
   const menuItems = [
-    { id: 'dashboard', label: 'แดชบอร์ด', icon: 'dashboard' },
-    { id: 'orders', label: 'จัดการออเดอร์', icon: 'receipt_long' },
+    { id: 'pos', label: 'จุดขาย (POS)', icon: 'point_of_sale' },
+    { id: 'orders', label: 'ประวัติออเดอร์', icon: 'history' },
     { id: 'menu', label: 'จัดการเมนู', icon: 'restaurant_menu' },
     { id: 'reports', label: 'รายงาน', icon: 'bar_chart' },
   ];
@@ -31,8 +31,8 @@ const Sidebar = ({ currentPage, onNavigate }) => {
             key={item.id}
             onClick={() => onNavigate(item.id)}
             className={`w-full px-6 py-3 flex items-center gap-3 transition-colors ${currentPage === item.id
-                ? 'bg-primary text-white'
-                : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+              ? 'bg-primary text-white'
+              : 'text-gray-400 hover:bg-gray-800 hover:text-white'
               }`}
           >
             <span className="material-symbols-outlined">{item.icon}</span>
