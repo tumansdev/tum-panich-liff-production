@@ -37,6 +37,11 @@ exports.getAllMenuItems = async (req, res) => {
 exports.getMenuItemById = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Validate ID
+    if (!id || isNaN(parseInt(id))) {
+      return res.status(400).json({ success: false, error: 'Invalid menu item ID' });
+    }
     
     const itemResult = await pool.query(
       'SELECT * FROM menu_items WHERE id = $1',

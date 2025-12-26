@@ -25,6 +25,9 @@ const { initWebSocket, getStats } = require('./websocket');
 
 const app = express();
 
+// Trust proxy (required for Nginx + Rate Limiting)
+app.set('trust proxy', 1);
+
 // Create HTTP server for both Express and WebSocket
 const server = http.createServer(app);
 
