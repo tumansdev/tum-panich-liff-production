@@ -1,0 +1,11 @@
+{
+  "contextFiles": [
+    ".gemini/GEMINI.md",
+    ".toh/agents/*.md",
+    ".toh/commands/*.md",
+    ".toh/skills/**/*.md",
+    ".toh/memory/*.md"
+  ],
+  "systemInstruction": "Your operating instructions are in .gemini/GEMINI.md. Follow Toh Framework methodology. All resources in .toh/. Respond in the language the user uses.",
+  "model": "gemini-2.5-flash"
+}

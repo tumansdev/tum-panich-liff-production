@@ -1,0 +1,48 @@
+# Example Nginx Configuration for Tum Panich LIFF
+# File: /etc/nginx/sites-available/tumpanich
+
+server {
+    listen 80;
+    server_name tumpanich.com www.tumpanich.com;
+
+    # Frontend (Static files served by Nginx or proxied if using separate frontend server)
+    # Assuming frontend is built to /var/www/tum-panich-liff/dist
+    location / {
+        root /var/www/tum-panich-liff/dist;
+        index index.html;
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Backend API
+    location /api {
+        proxy_pass http://localhost:5001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+        
+        # Real IP headers
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # WebSocket
+    location /ws {
+        proxy_pass http://localhost:5001;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Host $host;
+        
+        # Timeout settings for WebSocket
+        proxy_read_timeout 86400s;
+        proxy_send_timeout 86400s;
+    }
+
+    # Uploaded Files
+    location /uploads {
+        alias /var/www/tum-panich-liff/server/uploads;
+    }
+}

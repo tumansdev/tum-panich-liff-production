@@ -1,0 +1,17 @@
+{
+  "version": "1.7.0",
+  "installedAt": "2025-12-26T14:13:37.441Z",
+  "targetDir": "D:\\tum-panich-liff",
+  "ides": [
+    "claude",
+    "cursor",
+    "gemini"
+  ],
+  "components": {
+    "skills": true,
+    "agents": true,
+    "commands": true,
+    "templates": true,
+    "memory": true
+  }
+}
